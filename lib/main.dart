@@ -65,13 +65,34 @@ class SecureVaultApp extends StatelessWidget {
         BlocProvider(
           create: (_) => VaultBloc(vaultRepository: vaultRepository),
         ),
+        BlocProvider(
+          create: (_) =>
+              SettingsBloc(vaultRepository: vaultRepository)
+                ..add(const SettingsLoad()),
+        ),
       ],
-      child: MaterialApp(
-        title: 'SecureVault',
-        theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
-        themeMode: ThemeMode.system,
-        home: const AppNavigator(),
+      child: BlocBuilder<SettingsBloc, SettingsState>(
+        builder: (context, settingsState) {
+          ThemeMode themeMode = ThemeMode.system;
+          if (settingsState is SettingsLoaded) {
+            switch (settingsState.settings.themeMode) {
+              case 'light':
+                themeMode = ThemeMode.light;
+                break;
+              case 'dark':
+                themeMode = ThemeMode.dark;
+                break;
+            }
+          }
+
+          return MaterialApp(
+            title: 'SecureVault',
+            theme: AppTheme.light,
+            darkTheme: AppTheme.dark,
+            themeMode: themeMode,
+            home: const AppNavigator(),
+          );
+        },
       ),
     );
   }

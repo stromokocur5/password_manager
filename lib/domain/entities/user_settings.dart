@@ -1,29 +1,30 @@
 import 'package:equatable/equatable.dart';
 
-/// User preferences and settings.
+/// Domain entity for user settings.
 class UserSettings extends Equatable {
-  /// Auto-lock timeout in minutes (0 = never).
   final int autoLockMinutes;
-
-  /// Clear clipboard after copying (seconds, 0 = never).
   final int clipboardClearSeconds;
-
-  /// Whether biometric authentication is enabled.
   final bool biometricEnabled;
-
-  /// Theme mode: 'light', 'dark', or 'system'.
-  final String themeMode;
-
-  /// Default password generator length.
+  final String themeMode; // 'system', 'light', 'dark'
   final int defaultPasswordLength;
 
   const UserSettings({
-    this.autoLockMinutes = 5,
-    this.clipboardClearSeconds = 30,
-    this.biometricEnabled = false,
-    this.themeMode = 'system',
-    this.defaultPasswordLength = 16,
+    required this.autoLockMinutes,
+    required this.clipboardClearSeconds,
+    required this.biometricEnabled,
+    required this.themeMode,
+    required this.defaultPasswordLength,
   });
+
+  factory UserSettings.defaults() {
+    return const UserSettings(
+      autoLockMinutes: 5,
+      clipboardClearSeconds: 30,
+      biometricEnabled: false,
+      themeMode: 'system',
+      defaultPasswordLength: 16,
+    );
+  }
 
   UserSettings copyWith({
     int? autoLockMinutes,

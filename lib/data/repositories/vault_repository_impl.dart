@@ -1,7 +1,9 @@
 import 'dart:typed_data';
 
 import '../../core/encryption/encryption.dart';
+import '../../data/models/user_settings_model.dart';
 import '../../domain/entities/password_entry.dart';
+import '../../domain/entities/user_settings.dart';
 import '../../domain/repositories/vault_repository.dart';
 import '../datasources/local_datasource.dart';
 import '../models/password_entry_model.dart';
@@ -86,6 +88,32 @@ class VaultRepositoryImpl implements VaultRepository {
     for (final entry in entries) {
       await createEntry(entry);
     }
+  }
+
+  // ===== Settings =====
+
+  @override
+  UserSettings getSettings() {
+    final model = _localDataSource.getSettings();
+    return UserSettings(
+      autoLockMinutes: model.autoLockMinutes,
+      clipboardClearSeconds: model.clipboardClearSeconds,
+      biometricEnabled: model.biometricEnabled,
+      themeMode: model.themeMode,
+      defaultPasswordLength: model.defaultPasswordLength,
+    );
+  }
+
+  @override
+  Future<void> saveSettings(UserSettings settings) async {
+    final model = UserSettingsModel.create(
+      autoLockMinutes: settings.autoLockMinutes,
+      clipboardClearSeconds: settings.clipboardClearSeconds,
+      biometricEnabled: settings.biometricEnabled,
+      themeMode: settings.themeMode,
+      defaultPasswordLength: settings.defaultPasswordLength,
+    );
+    await _localDataSource.saveSettings(model);
   }
 
   // ===== Private Helpers =====

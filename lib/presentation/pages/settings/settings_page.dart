@@ -4,6 +4,9 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../blocs/auth/auth.dart';
+import '../../blocs/settings/settings_bloc.dart';
+import '../../blocs/settings/settings_event.dart';
+import '../../blocs/settings/settings_state.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/widgets.dart';
 
@@ -72,13 +75,35 @@ class SettingsPage extends StatelessWidget {
 
           // Appearance section
           _SectionHeader(title: 'Appearance', delay: 200),
-          _SettingsTile(
-            icon: Icons.dark_mode,
-            iconColor: AppColors.categoryIdentity,
-            title: 'Theme',
-            subtitle: 'System default',
-            onTap: () {},
-            delay: 250,
+          BlocBuilder<SettingsBloc, SettingsState>(
+            builder: (context, state) {
+              String currentTheme = 'System default';
+              if (state is SettingsLoaded) {
+                switch (state.settings.themeMode) {
+                  case 'light':
+                    currentTheme = 'Light';
+                    break;
+                  case 'dark':
+                    currentTheme = 'Dark';
+                    break;
+                  case 'system':
+                  default:
+                    currentTheme = 'System default';
+                    break;
+                }
+              }
+
+              return _SettingsTile(
+                icon: Icons.dark_mode,
+                iconColor: AppColors.categoryIdentity,
+                title: 'Theme',
+                subtitle: currentTheme,
+                onTap: () {
+                  _showThemeDialog(context);
+                },
+                delay: 250,
+              );
+            },
           ),
           const SizedBox(height: 24),
 
@@ -126,6 +151,67 @@ class SettingsPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _showThemeDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Select Theme'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _ThemeOption(
+              label: 'System Default',
+              value: 'system',
+              onTap: () {
+                context.read<SettingsBloc>().add(
+                  const SettingsUpdateTheme('system'),
+                );
+                Navigator.pop(context);
+              },
+            ),
+            _ThemeOption(
+              label: 'Light',
+              value: 'light',
+              onTap: () {
+                context.read<SettingsBloc>().add(
+                  const SettingsUpdateTheme('light'),
+                );
+                Navigator.pop(context);
+              },
+            ),
+            _ThemeOption(
+              label: 'Dark',
+              value: 'dark',
+              onTap: () {
+                context.read<SettingsBloc>().add(
+                  const SettingsUpdateTheme('dark'),
+                );
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ThemeOption extends StatelessWidget {
+  final String label;
+  final String value;
+  final VoidCallback onTap;
+
+  const _ThemeOption({
+    required this.label,
+    required this.value,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(title: Text(label), onTap: onTap);
   }
 }
 

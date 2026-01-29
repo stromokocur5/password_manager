@@ -1,4 +1,5 @@
 import '../entities/password_entry.dart';
+import '../entities/user_settings.dart';
 
 /// Abstract repository for vault operations.
 abstract class VaultRepository {
@@ -31,4 +32,10 @@ abstract class VaultRepository {
 
   /// Imports entries (from backup).
   Future<void> importEntries(List<PasswordEntry> entries);
+
+  /// Gets user settings.
+  UserSettings getSettings();
+
+  /// Saves user settings.
+  Future<void> saveSettings(UserSettings settings);
 }
