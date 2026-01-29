@@ -159,6 +159,7 @@ class _AppNavigatorState extends State<AppNavigator> {
             onAddEntry: () => setState(() => _creatingNewEntry = true),
             onViewEntry: (entry) => setState(() => _selectedEntry = entry),
             onOpenSettings: () => setState(() => _showSettings = true),
+            onOpenGenerator: () => setState(() => _showGenerator = true),
             onLock: () => context.read<AuthBloc>().add(const AuthLockVault()),
           );
         }

@@ -13,6 +13,7 @@ class VaultPage extends StatefulWidget {
   final VoidCallback onAddEntry;
   final void Function(PasswordEntry entry) onViewEntry;
   final VoidCallback onOpenSettings;
+  final VoidCallback onOpenGenerator;
   final VoidCallback onLock;
 
   const VaultPage({
@@ -20,6 +21,7 @@ class VaultPage extends StatefulWidget {
     required this.onAddEntry,
     required this.onViewEntry,
     required this.onOpenSettings,
+    required this.onOpenGenerator,
     required this.onLock,
   });
 
@@ -83,6 +85,11 @@ class _VaultPageState extends State<VaultPage> {
               HapticFeedback.mediumImpact();
               widget.onLock();
             },
+          ),
+          IconButton(
+            icon: const Icon(Icons.password),
+            tooltip: 'Password Generator',
+            onPressed: widget.onOpenGenerator,
           ),
           IconButton(
             icon: const Icon(Icons.settings),
