@@ -223,13 +223,17 @@ class _VaultPageState extends State<VaultPage> {
             width: 120,
             height: 120,
             decoration: BoxDecoration(
-              color: AppColors.woodyBrown.withAlpha(10),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? AppColors.accent.withAlpha(10)
+                  : AppColors.woodyBrown.withAlpha(10),
               borderRadius: BorderRadius.circular(60),
             ),
             child: Icon(
               isSearch ? Icons.search_off : Icons.lock_open,
               size: 56,
-              color: AppColors.woodyBrown.withAlpha(100),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? AppColors.accent.withAlpha(100)
+                  : AppColors.woodyBrown.withAlpha(100),
             ),
           ).animate().scale(
             begin: const Offset(0.8, 0.8),

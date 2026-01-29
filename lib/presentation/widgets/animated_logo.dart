@@ -25,17 +25,24 @@ class AnimatedLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     Widget logo = Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: AppColors.woodyBrown,
+        color: isDark ? AppColors.surfaceDark : AppColors.woodyBrown,
         borderRadius: BorderRadius.circular(size * 0.2),
+        border: isDark
+            ? Border.all(color: AppColors.accent.withAlpha(50), width: 1.5)
+            : null,
         boxShadow: [
           BoxShadow(
-            color: AppColors.woodyBrown.withAlpha(60),
+            color: isDark
+                ? Colors.black.withAlpha(100)
+                : AppColors.woodyBrown.withAlpha(60),
             offset: Offset(0, size * 0.08),
-            blurRadius: 0,
+            blurRadius: isDark ? 8 : 0,
           ),
         ],
       ),

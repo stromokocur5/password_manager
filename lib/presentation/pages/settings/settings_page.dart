@@ -223,6 +223,8 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: Row(
@@ -240,7 +242,9 @@ class _SectionHeader extends StatelessWidget {
                 title,
                 style: AppTypography.bodyLarge.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: AppColors.woodyBrown,
+                  color: isDark
+                      ? AppColors.textPrimaryDark
+                      : AppColors.woodyBrown,
                 ),
               ),
             ],
