@@ -51,54 +51,53 @@ class AppColors {
   static const categoryIdentity = Color(0xFF3498DB);
 }
 
-/// SecureVault typography - Gambarino headings, Satoshi body.
+/// SecureVault typography - Satoshi only.
 class AppTypography {
   AppTypography._();
 
-  static const headingFont = 'Gambarino';
-  static const bodyFont = 'Satoshi';
+  static const fontFamily = 'Satoshi';
 
-  // Headings (Gambarino)
+  // Headings (Satoshi Bold)
   static const headline1 = TextStyle(
-    fontFamily: headingFont,
+    fontFamily: fontFamily,
     fontSize: 32,
-    fontWeight: FontWeight.w400,
+    fontWeight: FontWeight.w700,
     letterSpacing: -0.5,
     height: 1.2,
   );
 
   static const headline2 = TextStyle(
-    fontFamily: headingFont,
+    fontFamily: fontFamily,
     fontSize: 26,
-    fontWeight: FontWeight.w400,
+    fontWeight: FontWeight.w700,
     letterSpacing: -0.3,
     height: 1.25,
   );
 
   static const headline3 = TextStyle(
-    fontFamily: headingFont,
+    fontFamily: fontFamily,
     fontSize: 22,
-    fontWeight: FontWeight.w400,
+    fontWeight: FontWeight.w700,
     height: 1.3,
   );
 
   // Body text (Satoshi)
   static const bodyLarge = TextStyle(
-    fontFamily: bodyFont,
+    fontFamily: fontFamily,
     fontSize: 16,
     fontWeight: FontWeight.w400,
     height: 1.5,
   );
 
   static const bodyMedium = TextStyle(
-    fontFamily: bodyFont,
+    fontFamily: fontFamily,
     fontSize: 14,
     fontWeight: FontWeight.w400,
     height: 1.5,
   );
 
   static const bodySmall = TextStyle(
-    fontFamily: bodyFont,
+    fontFamily: fontFamily,
     fontSize: 12,
     fontWeight: FontWeight.w400,
     height: 1.4,
@@ -106,21 +105,21 @@ class AppTypography {
 
   // UI elements (Satoshi)
   static const button = TextStyle(
-    fontFamily: bodyFont,
+    fontFamily: fontFamily,
     fontSize: 14,
     fontWeight: FontWeight.w600,
     letterSpacing: 0.3,
   );
 
   static const label = TextStyle(
-    fontFamily: bodyFont,
+    fontFamily: fontFamily,
     fontSize: 12,
     fontWeight: FontWeight.w500,
     letterSpacing: 0.2,
   );
 
   static const caption = TextStyle(
-    fontFamily: bodyFont,
+    fontFamily: fontFamily,
     fontSize: 11,
     fontWeight: FontWeight.w400,
   );
@@ -191,7 +190,7 @@ class AppTheme {
         onError: Colors.white,
       ),
       scaffoldBackgroundColor: AppColors.backgroundLight,
-      fontFamily: AppTypography.bodyFont,
+      fontFamily: AppTypography.fontFamily,
       textTheme: _buildTextTheme(isLight: true),
       cardTheme: CardThemeData(
         color: AppColors.cardLight,
@@ -313,7 +312,7 @@ class AppTheme {
         onError: Colors.white,
       ),
       scaffoldBackgroundColor: AppColors.backgroundDark,
-      fontFamily: AppTypography.bodyFont,
+      fontFamily: AppTypography.fontFamily,
       textTheme: _buildTextTheme(isLight: false),
       cardTheme: CardThemeData(
         color: AppColors.cardDark,

@@ -96,9 +96,6 @@ flutter:
 
   # Custom fonts for brand identity
   fonts:
-    - family: Gambarino
-      fonts:
-        - asset: assets/fonts/Gambarino-Regular.ttf
     - family: Satoshi
       fonts:
         - asset: assets/fonts/Satoshi-Regular.ttf
