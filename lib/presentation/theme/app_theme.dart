@@ -51,13 +51,23 @@ class AppColors {
   static const categoryIdentity = Color(0xFF3498DB);
 }
 
-/// SecureVault typography - Satoshi only.
+/// SecureVault typography - Satoshi variable font.
+/// Weights: 300 Light, 400 Regular, 500 Medium, 600 SemiBold, 700 Bold, 900 Black
 class AppTypography {
   AppTypography._();
 
   static const fontFamily = 'Satoshi';
 
-  // Headings (Satoshi Bold)
+  // Display (Black - for hero text)
+  static const display = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 40,
+    fontWeight: FontWeight.w900,
+    letterSpacing: -1.0,
+    height: 1.1,
+  );
+
+  // Headings (Bold)
   static const headline1 = TextStyle(
     fontFamily: fontFamily,
     fontSize: 32,
@@ -77,11 +87,26 @@ class AppTypography {
   static const headline3 = TextStyle(
     fontFamily: fontFamily,
     fontSize: 22,
-    fontWeight: FontWeight.w700,
+    fontWeight: FontWeight.w600,
     height: 1.3,
   );
 
-  // Body text (Satoshi)
+  // Titles (SemiBold)
+  static const titleLarge = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+    height: 1.35,
+  );
+
+  static const titleMedium = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 16,
+    fontWeight: FontWeight.w600,
+    height: 1.4,
+  );
+
+  // Body text (Regular/Medium)
   static const bodyLarge = TextStyle(
     fontFamily: fontFamily,
     fontSize: 16,
@@ -103,7 +128,7 @@ class AppTypography {
     height: 1.4,
   );
 
-  // UI elements (Satoshi)
+  // UI elements
   static const button = TextStyle(
     fontFamily: fontFamily,
     fontSize: 14,
@@ -118,10 +143,23 @@ class AppTypography {
     letterSpacing: 0.2,
   );
 
+  static const labelStrong = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 12,
+    fontWeight: FontWeight.w600,
+    letterSpacing: 0.2,
+  );
+
   static const caption = TextStyle(
     fontFamily: fontFamily,
     fontSize: 11,
     fontWeight: FontWeight.w400,
+  );
+
+  static const captionLight = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 11,
+    fontWeight: FontWeight.w300,
   );
 
   // Monospace for passwords
