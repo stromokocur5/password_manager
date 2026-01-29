@@ -94,11 +94,9 @@ flutter:
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package
 
-  # Custom fonts for brand identity
+  # Custom fonts for brand identity (variable font for all weights)
   fonts:
     - family: Satoshi
       fonts:
-        - asset: assets/fonts/Satoshi-Regular.ttf
-        - asset: assets/fonts/Satoshi-Bold.ttf
-          weight: 700
+        - asset: assets/fonts/Satoshi-Variable.ttf
 
