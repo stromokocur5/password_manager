@@ -3,10 +3,25 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../../../core/utils/password_generator.dart';
 import '../../../theme/app_theme.dart';
 
-class StrengthMeter extends StatelessWidget {
+class StrengthMeter extends StatefulWidget {
   final PasswordStrength strength;
 
   const StrengthMeter({super.key, required this.strength});
+
+  @override
+  State<StrengthMeter> createState() => _StrengthMeterState();
+}
+
+class _StrengthMeterState extends State<StrengthMeter> {
+  int _changeCount = 0;
+
+  @override
+  void didUpdateWidget(StrengthMeter oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.strength != widget.strength) {
+      _changeCount++;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +51,7 @@ class StrengthMeter extends StatelessWidget {
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 200),
           child: Container(
-            key: ValueKey(strength),
+            key: ValueKey('${widget.strength.name}_$_changeCount'),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             decoration: BoxDecoration(
               color: color.withAlpha(20),
@@ -56,7 +71,7 @@ class StrengthMeter extends StatelessWidget {
   }
 
   (Color, String, int) _getStrengthInfo() {
-    switch (strength) {
+    switch (widget.strength) {
       case PasswordStrength.weak:
         return (AppColors.strengthWeak, 'Weak', 1);
       case PasswordStrength.fair:
