@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../domain/entities/password_entry.dart';
 import '../../blocs/vault/vault.dart';
+import '../../theme/app_theme.dart';
+import '../../widgets/widgets.dart';
 
 /// Page for viewing and editing a password entry.
 class EntryDetailPage extends StatefulWidget {
@@ -34,6 +37,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
   bool _obscurePassword = true;
   bool _isEditing = false;
   String _selectedCategory = 'login';
+  bool _isSaving = false;
 
   bool get _isNewEntry => widget.entry == null;
 
@@ -63,8 +67,11 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
     super.dispose();
   }
 
-  void _onSave() {
+  void _onSave() async {
     if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isSaving = true);
+    HapticFeedback.mediumImpact();
 
     final entry = PasswordEntry.create(
       id: widget.entry?.id ?? const Uuid().v4(),
@@ -87,16 +94,21 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
       context.read<VaultBloc>().add(VaultUpdateEntry(entry));
     }
 
+    // Small delay for animation
+    await Future.delayed(const Duration(milliseconds: 300));
     widget.onSave();
   }
 
   void _onDelete() {
+    HapticFeedback.heavyImpact();
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Entry'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+        title: Text('Delete Entry', style: AppTypography.headline3),
         content: Text(
           'Are you sure you want to delete "${widget.entry?.name}"?',
+          style: AppTypography.bodyMedium,
         ),
         actions: [
           TextButton(
@@ -109,7 +121,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
               context.read<VaultBloc>().add(VaultDeleteEntry(widget.entry!.id));
               widget.onCancel();
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
             child: const Text('Delete'),
           ),
         ],
@@ -119,10 +131,16 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
 
   void _copyToClipboard(String text, String label) {
     Clipboard.setData(ClipboardData(text: text));
+    HapticFeedback.lightImpact();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$label copied to clipboard'),
-        behavior: SnackBarBehavior.floating,
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: AppColors.accent, size: 18),
+            const SizedBox(width: 12),
+            Text('$label copied'),
+          ],
+        ),
         duration: const Duration(seconds: 2),
       ),
     );
@@ -130,6 +148,8 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final categoryColor = getCategoryColor(_selectedCategory);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -156,146 +176,271 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            // Hero category icon
+            Center(
+              child: Hero(
+                tag: 'entry_icon_${widget.entry?.id ?? 'new'}',
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: categoryColor.withAlpha(30),
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: categoryColor, width: 2),
+                  ),
+                  child: Icon(
+                    _getCategoryIcon(),
+                    color: categoryColor,
+                    size: 40,
+                  ),
+                ),
+              ),
+            ).animate().scale(
+              begin: const Offset(0.8, 0.8),
+              duration: 400.ms,
+              curve: Curves.elasticOut,
+            ),
+            const SizedBox(height: 24),
+
             // Category selector
             if (_isEditing) ...[
-              Text('Category', style: Theme.of(context).textTheme.labelLarge),
-              const SizedBox(height: 8),
-              SegmentedButton<String>(
-                segments: const [
-                  ButtonSegment(
-                    value: 'login',
-                    label: Text('Login'),
-                    icon: Icon(Icons.person),
-                  ),
-                  ButtonSegment(
-                    value: 'card',
-                    label: Text('Card'),
-                    icon: Icon(Icons.credit_card),
-                  ),
-                  ButtonSegment(
-                    value: 'secure_note',
-                    label: Text('Note'),
-                    icon: Icon(Icons.note),
-                  ),
-                ],
-                selected: {_selectedCategory},
-                onSelectionChanged: (selection) {
-                  setState(() => _selectedCategory = selection.first);
-                },
+              Text(
+                'Category',
+                style: AppTypography.label.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
               ),
+              const SizedBox(height: 8),
+              _CategorySelector(
+                selected: _selectedCategory,
+                onChanged: (cat) => setState(() => _selectedCategory = cat),
+              ).animate().fadeIn(duration: 300.ms),
               const SizedBox(height: 24),
             ],
 
-            // Name field
-            TextFormField(
+            // Form fields
+            _buildTextField(
               controller: _nameController,
+              label: 'Name',
+              icon: Icons.label,
               enabled: _isEditing,
-              decoration: const InputDecoration(
-                labelText: 'Name',
-                prefixIcon: Icon(Icons.label),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a name';
-                }
-                return null;
-              },
+              validator: (value) =>
+                  value?.isEmpty == true ? 'Please enter a name' : null,
             ),
             const SizedBox(height: 16),
 
-            // Username field
-            TextFormField(
+            _buildTextField(
               controller: _usernameController,
+              label: 'Username / Email',
+              icon: Icons.person,
               enabled: _isEditing,
-              decoration: InputDecoration(
-                labelText: 'Username / Email',
-                prefixIcon: const Icon(Icons.person),
-                suffixIcon: !_isEditing && _usernameController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.copy),
-                        onPressed: () => _copyToClipboard(
-                          _usernameController.text,
-                          'Username',
-                        ),
-                      )
-                    : null,
-              ),
+              showCopy: !_isEditing && _usernameController.text.isNotEmpty,
+              onCopy: () =>
+                  _copyToClipboard(_usernameController.text, 'Username'),
             ),
             const SizedBox(height: 16),
 
-            // Password field
-            TextFormField(
-              controller: _passwordController,
-              enabled: _isEditing,
-              obscureText: _obscurePassword,
-              decoration: InputDecoration(
-                labelText: 'Password',
-                prefixIcon: const Icon(Icons.key),
-                suffixIcon: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility
-                            : Icons.visibility_off,
-                      ),
-                      onPressed: () =>
-                          setState(() => _obscurePassword = !_obscurePassword),
-                    ),
-                    if (!_isEditing && _passwordController.text.isNotEmpty)
-                      IconButton(
-                        icon: const Icon(Icons.copy),
-                        onPressed: () => _copyToClipboard(
-                          _passwordController.text,
-                          'Password',
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
+            _buildPasswordField(),
             const SizedBox(height: 16),
 
-            // URI field
-            TextFormField(
+            _buildTextField(
               controller: _uriController,
+              label: 'Website URL',
+              icon: Icons.link,
               enabled: _isEditing,
-              decoration: InputDecoration(
-                labelText: 'Website URL',
-                prefixIcon: const Icon(Icons.link),
-                suffixIcon: !_isEditing && _uriController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.copy),
-                        onPressed: () =>
-                            _copyToClipboard(_uriController.text, 'URL'),
-                      )
-                    : null,
-              ),
+              showCopy: !_isEditing && _uriController.text.isNotEmpty,
+              onCopy: () => _copyToClipboard(_uriController.text, 'URL'),
               keyboardType: TextInputType.url,
             ),
             const SizedBox(height: 16),
 
-            // Notes field
-            TextFormField(
+            _buildTextField(
               controller: _notesController,
+              label: 'Notes',
+              icon: Icons.notes,
               enabled: _isEditing,
               maxLines: 4,
-              decoration: const InputDecoration(
-                labelText: 'Notes',
-                prefixIcon: Icon(Icons.notes),
-                alignLabelWithHint: true,
-              ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
 
             // Save button
             if (_isEditing)
-              ElevatedButton(
-                onPressed: _onSave,
-                child: Text(_isNewEntry ? 'Create Entry' : 'Save Changes'),
+              AnimatedButton(
+                    label: _isNewEntry ? 'Create Entry' : 'Save Changes',
+                    icon: Icons.check,
+                    isLoading: _isSaving,
+                    onPressed: _isSaving ? null : _onSave,
+                  )
+                  .animate()
+                  .fadeIn(delay: 200.ms, duration: 300.ms)
+                  .slideY(begin: 0.2, end: 0, duration: 300.ms),
+          ],
+        ),
+      ),
+    );
+  }
+
+  IconData _getCategoryIcon() {
+    switch (_selectedCategory) {
+      case 'login':
+        return Icons.person;
+      case 'card':
+        return Icons.credit_card;
+      case 'identity':
+        return Icons.badge;
+      case 'secure_note':
+        return Icons.note;
+      default:
+        return Icons.lock;
+    }
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    required bool enabled,
+    String? Function(String?)? validator,
+    bool showCopy = false,
+    VoidCallback? onCopy,
+    TextInputType? keyboardType,
+    int maxLines = 1,
+  }) {
+    return TextFormField(
+      controller: controller,
+      enabled: enabled,
+      validator: validator,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      style: AppTypography.bodyMedium,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon),
+        alignLabelWithHint: maxLines > 1,
+        suffixIcon: showCopy
+            ? IconButton(
+                icon: const Icon(Icons.copy, size: 20),
+                onPressed: onCopy,
+              )
+            : null,
+      ),
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return TextFormField(
+      controller: _passwordController,
+      enabled: _isEditing,
+      obscureText: _obscurePassword,
+      style: AppTypography.bodyMedium,
+      decoration: InputDecoration(
+        labelText: 'Password',
+        prefixIcon: const Icon(Icons.key),
+        suffixIcon: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: Icon(
+                _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                size: 20,
+              ),
+              onPressed: () =>
+                  setState(() => _obscurePassword = !_obscurePassword),
+            ),
+            if (!_isEditing && _passwordController.text.isNotEmpty)
+              IconButton(
+                icon: const Icon(Icons.copy, size: 20),
+                onPressed: () =>
+                    _copyToClipboard(_passwordController.text, 'Password'),
               ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CategorySelector extends StatelessWidget {
+  final String selected;
+  final ValueChanged<String> onChanged;
+
+  const _CategorySelector({required this.selected, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        _CategoryButton(
+          id: 'login',
+          icon: Icons.person,
+          label: 'Login',
+          isSelected: selected == 'login',
+          onTap: () => onChanged('login'),
+        ),
+        const SizedBox(width: 8),
+        _CategoryButton(
+          id: 'card',
+          icon: Icons.credit_card,
+          label: 'Card',
+          isSelected: selected == 'card',
+          onTap: () => onChanged('card'),
+        ),
+        const SizedBox(width: 8),
+        _CategoryButton(
+          id: 'secure_note',
+          icon: Icons.note,
+          label: 'Note',
+          isSelected: selected == 'secure_note',
+          onTap: () => onChanged('secure_note'),
+        ),
+      ],
+    );
+  }
+}
+
+class _CategoryButton extends StatelessWidget {
+  final String id;
+  final IconData icon;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _CategoryButton({
+    required this.id,
+    required this.icon,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = getCategoryColor(id);
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color: isSelected ? color : color.withAlpha(20),
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: color, width: isSelected ? 2 : 1),
+          ),
+          child: Column(
+            children: [
+              Icon(icon, color: isSelected ? Colors.white : color, size: 24),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: AppTypography.label.copyWith(
+                  color: isSelected ? Colors.white : color,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

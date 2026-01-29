@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../blocs/auth/auth.dart';
+import '../../theme/app_theme.dart';
+import '../../widgets/widgets.dart';
 
 /// Settings page.
 class SettingsPage extends StatelessWidget {
@@ -20,19 +24,21 @@ class SettingsPage extends StatelessWidget {
         ),
       ),
       body: ListView(
+        padding: const EdgeInsets.all(16),
         children: [
           // Security section
-          _SectionHeader(title: 'Security'),
-          ListTile(
-            leading: const Icon(Icons.fingerprint),
-            title: const Text('Biometric Unlock'),
-            subtitle: const Text('Use fingerprint or face to unlock'),
+          _SectionHeader(title: 'Security', delay: 0),
+          _SettingsTile(
+            icon: Icons.fingerprint,
+            iconColor: AppColors.categoryLogin,
+            title: 'Biometric Unlock',
+            subtitle: 'Use fingerprint or face to unlock',
             trailing: BlocBuilder<AuthBloc, AuthState>(
               builder: (context, state) {
-                // Simplified - would need proper state management
                 return Switch(
                   value: false,
                   onChanged: (value) {
+                    HapticFeedback.lightImpact();
                     if (value) {
                       context.read<AuthBloc>().add(const AuthEnableBiometric());
                     } else {
@@ -44,116 +50,79 @@ class SettingsPage extends StatelessWidget {
                 );
               },
             ),
+            delay: 50,
           ),
-          ListTile(
-            leading: const Icon(Icons.timer),
-            title: const Text('Auto-lock Timeout'),
-            subtitle: const Text('5 minutes'),
-            onTap: () {
-              // Show timeout picker
-            },
+          _SettingsTile(
+            icon: Icons.timer,
+            iconColor: AppColors.categoryCard,
+            title: 'Auto-lock Timeout',
+            subtitle: '5 minutes',
+            onTap: () {},
+            delay: 100,
           ),
-          ListTile(
-            leading: const Icon(Icons.content_paste_off),
-            title: const Text('Clear Clipboard'),
-            subtitle: const Text('30 seconds'),
-            onTap: () {
-              // Show timeout picker
-            },
+          _SettingsTile(
+            icon: Icons.content_paste_off,
+            iconColor: AppColors.categoryNote,
+            title: 'Clear Clipboard',
+            subtitle: '30 seconds',
+            onTap: () {},
+            delay: 150,
           ),
-          const Divider(),
+          const SizedBox(height: 24),
 
           // Appearance section
-          _SectionHeader(title: 'Appearance'),
-          ListTile(
-            leading: const Icon(Icons.dark_mode),
-            title: const Text('Theme'),
-            subtitle: const Text('System default'),
-            onTap: () {
-              // Show theme picker
-            },
+          _SectionHeader(title: 'Appearance', delay: 200),
+          _SettingsTile(
+            icon: Icons.dark_mode,
+            iconColor: AppColors.categoryIdentity,
+            title: 'Theme',
+            subtitle: 'System default',
+            onTap: () {},
+            delay: 250,
           ),
-          const Divider(),
+          const SizedBox(height: 24),
 
           // Data section
-          _SectionHeader(title: 'Data'),
-          ListTile(
-            leading: const Icon(Icons.upload),
-            title: const Text('Export Vault'),
-            subtitle: const Text('Export encrypted backup'),
-            onTap: () {
-              // Export functionality
-            },
+          _SectionHeader(title: 'Data', delay: 300),
+          _SettingsTile(
+            icon: Icons.upload,
+            iconColor: AppColors.success,
+            title: 'Export Vault',
+            subtitle: 'Export encrypted backup',
+            onTap: () {},
+            delay: 350,
           ),
-          ListTile(
-            leading: const Icon(Icons.download),
-            title: const Text('Import'),
-            subtitle: const Text('Import from backup or other managers'),
-            onTap: () {
-              // Import functionality
-            },
+          _SettingsTile(
+            icon: Icons.download,
+            iconColor: AppColors.info,
+            title: 'Import',
+            subtitle: 'Import from backup or other managers',
+            onTap: () {},
+            delay: 400,
           ),
-          const Divider(),
+          const SizedBox(height: 24),
 
           // About section
-          _SectionHeader(title: 'About'),
-          ListTile(
-            leading: const Icon(Icons.info),
-            title: const Text('Version'),
-            subtitle: const Text('1.0.0'),
+          _SectionHeader(title: 'About', delay: 450),
+          _SettingsTile(
+            icon: Icons.info,
+            iconColor: AppColors.textSecondaryLight,
+            title: 'Version',
+            subtitle: '1.0.0',
+            delay: 500,
           ),
-          ListTile(
-            leading: const Icon(Icons.code),
-            title: const Text('Source Code'),
-            subtitle: const Text('View on GitHub'),
-            onTap: () {
-              // Open GitHub
-            },
+          _SettingsTile(
+            icon: Icons.code,
+            iconColor: AppColors.textSecondaryLight,
+            title: 'Source Code',
+            subtitle: 'View on GitHub',
+            onTap: () {},
+            delay: 550,
           ),
           const SizedBox(height: 32),
 
           // Danger zone
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: OutlinedButton.icon(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Reset Vault'),
-                    content: const Text(
-                      'This will permanently delete all your data. This action cannot be undone.',
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: const Text('Cancel'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          // Reset vault
-                          Navigator.of(context).pop();
-                        },
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.red,
-                        ),
-                        child: const Text('Delete Everything'),
-                      ),
-                    ],
-                  ),
-                );
-              },
-              icon: const Icon(Icons.delete_forever, color: Colors.red),
-              label: const Text(
-                'Reset Vault',
-                style: TextStyle(color: Colors.red),
-              ),
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Colors.red),
-              ),
-            ),
-          ),
-          const SizedBox(height: 32),
+          _DangerZone(delay: 600),
         ],
       ),
     );
@@ -162,20 +131,205 @@ class SettingsPage extends StatelessWidget {
 
 class _SectionHeader extends StatelessWidget {
   final String title;
+  final int delay;
 
-  const _SectionHeader({required this.title});
+  const _SectionHeader({required this.title, required this.delay});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-          color: Theme.of(context).colorScheme.primary,
-          fontWeight: FontWeight.bold,
-        ),
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Row(
+            children: [
+              Container(
+                width: 4,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: AppColors.accent,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                title,
+                style: AppTypography.bodyLarge.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.woodyBrown,
+                ),
+              ),
+            ],
+          ),
+        )
+        .animate()
+        .fadeIn(
+          delay: Duration(milliseconds: delay),
+          duration: 300.ms,
+        )
+        .slideX(begin: -0.1, end: 0, duration: 300.ms);
+  }
+}
+
+class _SettingsTile extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String subtitle;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+  final int delay;
+
+  const _SettingsTile({
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.subtitle,
+    this.trailing,
+    this.onTap,
+    required this.delay,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BrandCard(
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          onTap: onTap,
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: iconColor.withAlpha(30),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Icon(icon, color: iconColor, size: 20),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: AppTypography.bodyMedium),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (trailing != null) trailing!,
+              if (onTap != null && trailing == null)
+                Icon(
+                  Icons.chevron_right,
+                  color: AppColors.textSecondaryLight,
+                  size: 20,
+                ),
+            ],
+          ),
+        )
+        .animate()
+        .fadeIn(
+          delay: Duration(milliseconds: delay),
+          duration: 300.ms,
+        )
+        .slideX(begin: 0.05, end: 0, duration: 300.ms);
+  }
+}
+
+class _DangerZone extends StatelessWidget {
+  final int delay;
+
+  const _DangerZone({required this.delay});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.error.withAlpha(10),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: AppColors.error.withAlpha(50)),
       ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.warning, color: AppColors.error, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                'Danger Zone',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.error,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          GestureDetector(
+            onTap: () {
+              HapticFeedback.heavyImpact();
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  title: Text('Reset Vault', style: AppTypography.headline3),
+                  content: Text(
+                    'This will permanently delete all your data. This action cannot be undone.',
+                    style: AppTypography.bodyMedium,
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.error,
+                      ),
+                      child: const Text('Delete Everything'),
+                    ),
+                  ],
+                ),
+              );
+            },
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.error),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.delete_forever, color: AppColors.error, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Reset Vault',
+                    style: AppTypography.button.copyWith(
+                      color: AppColors.error,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    ).animate().fadeIn(
+      delay: Duration(milliseconds: delay),
+      duration: 400.ms,
     );
   }
 }
