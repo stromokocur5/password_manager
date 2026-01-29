@@ -127,14 +127,18 @@ class _UnlockPageState extends State<UnlockPage> {
                               labelText: 'Master Password',
                               prefixIcon: Icon(
                                 Icons.lock,
-                                color: AppColors.woodyBrown,
+                                color: isDark
+                                    ? AppColors.textSecondaryDark
+                                    : AppColors.woodyBrown,
                               ),
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   _obscurePassword
                                       ? Icons.visibility
                                       : Icons.visibility_off,
-                                  color: AppColors.textSecondaryLight,
+                                  color: isDark
+                                      ? AppColors.textSecondaryDark
+                                      : AppColors.textSecondaryLight,
                                 ),
                                 onPressed: () => setState(
                                   () => _obscurePassword = !_obscurePassword,
