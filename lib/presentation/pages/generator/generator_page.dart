@@ -43,7 +43,6 @@ class _GeneratorPageState extends State<GeneratorPage> {
     );
 
     try {
-      _previousPassword = _generatedPassword;
       setState(() {
         _generatedPassword = _generator.generate(options);
       });
