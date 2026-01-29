@@ -135,16 +135,7 @@ class _AppNavigatorState extends State<AppNavigator> {
           }
 
           if (_showGenerator) {
-            return Scaffold(
-              appBar: AppBar(
-                title: const Text('Password Generator'),
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: _navigateToVault,
-                ),
-              ),
-              body: const GeneratorPage(),
-            );
+            return GeneratorPage(onClose: _navigateToVault);
           }
 
           if (_selectedEntry != null || _creatingNewEntry) {

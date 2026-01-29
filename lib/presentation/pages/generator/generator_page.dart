@@ -13,26 +13,35 @@ import 'widgets/strength_meter.dart';
 
 /// Page for generating secure passwords.
 class GeneratorPage extends StatelessWidget {
-  const GeneratorPage({super.key});
+  final VoidCallback? onClose;
+
+  const GeneratorPage({super.key, this.onClose});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => GeneratorCubit(PasswordGenerator()),
-      child: const _GeneratorView(),
+      child: _GeneratorView(onClose: onClose),
     );
   }
 }
 
 class _GeneratorView extends StatelessWidget {
-  const _GeneratorView();
+  final VoidCallback? onClose;
+
+  const _GeneratorView({this.onClose});
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Password Generator')),
+      appBar: AppBar(
+        title: const Text('Password Generator'),
+        leading: onClose != null
+            ? IconButton(icon: const Icon(Icons.arrow_back), onPressed: onClose)
+            : null,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
