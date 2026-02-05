@@ -25,6 +25,7 @@ void main() async {
   // Initialize repositories
   final authRepository = AuthRepositoryImpl(
     secureDataSource: secureDataSource,
+    localDataSource: localDataSource,
     keyDerivation: keyDerivation,
   );
 

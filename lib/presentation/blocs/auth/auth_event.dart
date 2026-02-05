@@ -52,3 +52,8 @@ class AuthEnableBiometric extends AuthEvent {
 class AuthDisableBiometric extends AuthEvent {
   const AuthDisableBiometric();
 }
+
+/// Reset the vault (deletes all data).
+class AuthResetVault extends AuthEvent {
+  const AuthResetVault();
+}

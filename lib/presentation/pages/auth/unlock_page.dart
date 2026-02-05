@@ -43,6 +43,60 @@ class _UnlockPageState extends State<UnlockPage> {
     context.read<AuthBloc>().add(const AuthUnlockWithBiometric());
   }
 
+  void _showResetConfirmationDialog() {
+    final confirmController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: AppColors.error),
+            const SizedBox(width: 8),
+            const Text('Reset Vault?'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'This will permanently delete all your stored passwords. This action cannot be undone.',
+              style: AppTypography.bodyMedium,
+            ),
+            const SizedBox(height: 16),
+            Text('Type RESET to confirm:', style: AppTypography.bodySmall),
+            const SizedBox(height: 8),
+            TextField(
+              controller: confirmController,
+              decoration: const InputDecoration(
+                hintText: 'RESET',
+                border: OutlineInputBorder(),
+              ),
+              autofocus: true,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (confirmController.text == 'RESET') {
+                Navigator.of(dialogContext).pop();
+                HapticFeedback.heavyImpact();
+                context.read<AuthBloc>().add(const AuthResetVault());
+              }
+            },
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: const Text('Reset Vault'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -233,6 +287,27 @@ class _UnlockPageState extends State<UnlockPage> {
                     return const SizedBox.shrink();
                   },
                 ),
+
+                const SizedBox(height: 48),
+
+                // Forgot Password option
+                Center(
+                  child: GestureDetector(
+                    onTap: _showResetConfirmationDialog,
+                    child: Text(
+                      'Forgot Password?',
+                      style: AppTypography.bodySmall.copyWith(
+                        color: isDark
+                            ? AppColors.textSecondaryDark
+                            : Colors.white.withAlpha(180),
+                        decoration: TextDecoration.underline,
+                        decorationColor: isDark
+                            ? AppColors.textSecondaryDark
+                            : Colors.white.withAlpha(180),
+                      ),
+                    ),
+                  ),
+                ).animate().fadeIn(delay: 700.ms, duration: 400.ms),
               ],
             ),
           ),

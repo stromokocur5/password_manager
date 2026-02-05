@@ -18,6 +18,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthLockVault>(_onLockVault);
     on<AuthEnableBiometric>(_onEnableBiometric);
     on<AuthDisableBiometric>(_onDisableBiometric);
+    on<AuthResetVault>(_onResetVault);
   }
 
   Future<void> _onCheckVaultSetup(
@@ -149,5 +150,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     await _authRepository.disableBiometric();
     emit(const AuthUnlocked());
+  }
+
+  Future<void> _onResetVault(
+    AuthResetVault event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(const AuthLoading());
+
+    try {
+      await _authRepository.resetVault();
+      emit(const AuthNeedsSetup());
+    } catch (e) {
+      emit(AuthError('Failed to reset vault: $e'));
+    }
   }
 }

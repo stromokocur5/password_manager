@@ -4,11 +4,13 @@ import 'package:local_auth/local_auth.dart';
 
 import '../../core/encryption/encryption.dart';
 import '../../domain/repositories/auth_repository.dart';
+import '../datasources/local_datasource.dart';
 import '../datasources/secure_datasource.dart';
 
 /// Implementation of [AuthRepository] using secure storage and local_auth.
 class AuthRepositoryImpl implements AuthRepository {
   final SecureDataSource _secureDataSource;
+  final LocalDataSource _localDataSource;
   final KeyDerivationService _keyDerivation;
   final LocalAuthentication _localAuth;
 
@@ -17,9 +19,11 @@ class AuthRepositoryImpl implements AuthRepository {
 
   AuthRepositoryImpl({
     required SecureDataSource secureDataSource,
+    required LocalDataSource localDataSource,
     required KeyDerivationService keyDerivation,
     LocalAuthentication? localAuth,
   }) : _secureDataSource = secureDataSource,
+       _localDataSource = localDataSource,
        _keyDerivation = keyDerivation,
        _localAuth = localAuth ?? LocalAuthentication();
 
@@ -168,5 +172,18 @@ class AuthRepositoryImpl implements AuthRepository {
       result |= a[i] ^ b[i];
     }
     return result == 0;
+  }
+
+  /// Resets the entire vault by clearing all data.
+  /// This is a destructive operation used when the user forgets their master password.
+  Future<void> resetVault() async {
+    // Clear encryption key from memory
+    await lockVault();
+
+    // Clear secure storage (salt, password hash, biometric key)
+    await _secureDataSource.clearAll();
+
+    // Clear all password entries from local database
+    await _localDataSource.clearAllEntries();
   }
 }
